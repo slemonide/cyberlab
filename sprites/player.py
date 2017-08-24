@@ -102,11 +102,16 @@ class Player(ActiveSprite):
             self.vx *= 0.707
             self.vy *= 0.707
 
-        if game.get_key_jp(pg.K_q) or game.get_joystick_jp(J_BUTTONS['X']):
+        if (pg.K_q in game.keys_just_pressed or
+                J_BUTTONS['X'] in game.joystick_just_pressed):
             self.drop_item()
-        elif game.get_key_jp(pg.K_g) or game.get_key_jp(pg.K_e) or game.get_joystick_jp(J_BUTTONS['A']):
+        elif (pg.K_g in game.keys_just_pressed or
+                pg.K_e in game.keys_just_pressed or
+                J_BUTTONS['A'] in game.joystick_just_pressed):
             self.pickup_items()
-        if game.get_key_jp(pg.K_SPACE) or game.get_joystick_jp(J_BUTTONS['A']) or game.get_joystick_jp(J_BUTTONS['B']):
+        if (pg.K_SPACE in game.keys_just_pressed or
+                J_BUTTONS['A'] in game.joystick_just_pressed or
+                J_BUTTONS['B'] in game.joystick_just_pressed):
             game.text_queue.pop()
 
         return self.is_moving()
@@ -147,7 +152,7 @@ class Player(ActiveSprite):
             if item.pickable is not None:
                 if auto_pick is True and item.pickable.auto_pick is False:
                     continue
-                self.game.text_queue.append("Picking up "+item.pickable.id+" ...")
+                self.game.text_queue.append("Picking up " + item.pickable.id + " ...")
                 # TODO move to pickable.py?
                 self.container.add(item.pickable)
                 item.remove(sprite_groups.all_sprites, sprite_groups.items_on_floor)
@@ -160,4 +165,4 @@ class Player(ActiveSprite):
             item = pickable.owner
             item.set_position(self.x, self.y)
             item.add(sprite_groups.all_sprites, sprite_groups.items_on_floor)
-            self.game.text_queue.append("Dropping "+item.pickable.id+" ...")
+            self.game.text_queue.append("Dropping " + item.pickable.id + " ...")

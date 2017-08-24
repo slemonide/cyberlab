@@ -28,19 +28,14 @@ class Game:
         # Contains menus displayed on the player's screen
         self.menu_queue = [] # TODO: finish
 
-        # Contains action triggers
-        self.triggers = []
-
         # Contains the user-controlled player
         self.player = None
 
         # Contains keyboard keys just pressed
-        # TODO: @Kuroneko: when does this gets updated?
-        self.keys_just_pressed = {}
+        self.keys_just_pressed = set()
 
         # Contains joystick controls just pressed
-        # TODO: @Kuroneko: when does this gets updated?
-        self.joystick_just_pressed = {}
+        self.joystick_just_pressed = set()
 
         # Contains the spritesheet. Useful for defining sprites
         self.spritesheet = None
@@ -108,6 +103,110 @@ class Game:
 
         self.__camera__ = Camera(self.__map__.width_screen, self.__map__.height_screen)
 
+    def run(self):
+        """
+        Run the game
+        :return: nothing
+        """
+        self.__playing__ = True
+        while self.__playing__:
+            self.__dt__ = self.__clock__.tick(FPS) / 1000
+            self.__events__()
+            self.__update__()
+            self.__draw__()
+
+    def get_axis(self, axis_number):
+        """
+        Produce the position of joystick axis
+
+        The axis number must be an integer from zero to get_numaxes()-1.
+
+        :param axis_number: Axis number
+        :return: if there is joystick, produce the position of the joystick axis,
+        otherwise produce 0
+        """
+        if self.__joystick__ is not None:
+            return self.__joystick__.get_axis(axis_number)
+        return 0.0
+
+    def set_visibility(self, tilex, tiley, value):
+        """
+        Sets the visibility of the sprite at the given tile position
+        :param tilex:
+        :param tiley:
+        :param value:
+        :return:
+        """
+        self.__visibility_data__[tilex][tiley] = value
+        self.update_fov = True
+
+    #  ___________________________________________________________________
+    # |                        _                   _                      |
+    # |         _ __    _ __  (_) __   __   __ _  | |_    ___             |
+    # |        | '_ \  | '__| | | \ \ / /  / _` | | __|  / _ \            |
+    # |        | |_) | | |    | |  \ V /  | (_| | | |_  |  __/            |
+    # |        | .__/  |_|    |_|   \_/    \__,_|  \__|  \___|            |
+    # |        |_|                                                        |
+    # |___________________________________________________________________|
+
+    def __put_text_on_screen__(self, text):
+        self.__display__.blit(self.__textBox__, (0, 360))
+        self.__display__.blit(self.__font__.render(text, True, (255, 255, 255)), (150, 390))
+        self.__display__.blit(self.__fontSpace__.render("[SPACE]", True, (255, 255, 255)), (560, 440))
+        pg.display.flip()
+
+    def __draw_fov__(self):
+        for x in range(len(self.__fov_data__)):
+            for y in range(len(self.__fov_data__[0])):
+                if self.__fov_data__[x][y]:
+                    newx, newy = self.__camera__.transform_xy(x * TILE_SIZE, y * TILE_SIZE)
+                    pg.draw.rect(self.__display__, (200, 200, 200), pg.Rect(newx, newy,
+                                                                            TILE_SIZE, TILE_SIZE), 1)
+
+    def __toggle_fullscreen__(self):
+        """Taken from http://pygame.org/wiki/__toggle_fullscreen__"""
+
+        screen = pg.display.get_surface()
+        tmp = screen.convert()
+        caption = pg.display.get_caption()
+        cursor = pg.mouse.get_cursor()
+
+        w, h = screen.get_width(), screen.get_height()
+        flags = screen.get_flags()
+        bits = screen.get_bitsize()
+
+        pg.display.quit()
+        pg.display.init()
+
+        self.__display__ = pg.display.set_mode((w, h), flags ^ pg.FULLSCREEN, bits)
+        self.__display__.blit(tmp, (0, 0))
+        pg.display.set_caption(*caption)
+
+        pg.key.set_mods(0)
+
+        pg.mouse.set_cursor(*cursor)
+
+        return screen
+
+    def __quit__(self):
+        pg.quit()
+        sys.exit()
+
+    def __events__(self):
+        self.keys_just_pressed.clear()
+        self.joystick_just_pressed.clear()
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.__quit__()
+            if event.type == pg.KEYDOWN:
+                self.keys_just_pressed.add(event.key)
+                if event.key == pg.K_ESCAPE:
+                    self.__quit__()
+                if event.key == pg.K_F11:
+                    self.__toggle_fullscreen__()
+            if event.type == pg.JOYBUTTONDOWN:
+                self.joystick_just_pressed.add(event.button)
+
     def __update__(self):
         self.__gui__.pre(self.__joystick__)
 
@@ -148,98 +247,3 @@ class Game:
 
         self.__gui__.draw()
         pg.display.flip()
-
-    def run(self):
-        """
-        Run the game
-        :return: nothing
-        """
-        self.__playing__ = True
-        while self.__playing__:
-            self.__dt__ = self.__clock__.tick(FPS) / 1000
-            self.__events__()
-            self.__update__()
-            self.__draw__()
-
-    def __quit__(self):
-        pg.quit()
-        sys.exit()
-
-    def __events__(self):
-        self.keys_just_pressed.clear()
-        self.joystick_just_pressed.clear()
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                self.__quit__()
-            if event.type == pg.KEYDOWN:
-                self.keys_just_pressed[event.key] = True
-                if event.key == pg.K_ESCAPE:
-                    self.__quit__()
-                if event.key == pg.K_F11:
-                    self.__toggle_fullscreen__()
-            if event.type == pg.JOYBUTTONDOWN:
-                self.joystick_just_pressed[event.button] = True
-
-    def __toggle_fullscreen__(self):
-        """Taken from http://pygame.org/wiki/__toggle_fullscreen__"""
-
-        screen = pg.display.get_surface()
-        tmp = screen.convert()
-        caption = pg.display.get_caption()
-        cursor = pg.mouse.get_cursor()
-
-        w, h = screen.get_width(), screen.get_height()
-        flags = screen.get_flags()
-        bits = screen.get_bitsize()
-
-        pg.display.quit()
-        pg.display.init()
-
-        self.__display__ = pg.display.set_mode((w, h), flags ^ pg.FULLSCREEN, bits)
-        self.__display__.blit(tmp, (0, 0))
-        pg.display.set_caption(*caption)
-
-        pg.key.set_mods(0)
-
-        pg.mouse.set_cursor(*cursor)
-
-        return screen
-
-    # TODO: remove as game.get_key_jp can do the same thing
-    def get_key_jp(self, key):
-        # get key just pressed (clears on new frame)
-        if key in self.keys_just_pressed:
-            return True
-        return False
-
-    # TODO: remove as game.joystick_just_pressed can do the same thing
-    def get_joystick_jp(self, button):
-        # get joystick button just pressed (clears on new frame)
-        if button in self.joystick_just_pressed:
-            return True
-        return False
-
-    # TODO: remove and make game.__joystick__ public
-    def get_axis(self, number):
-        if self.__joystick__ is not None:
-            return self.__joystick__.get_axis(number)
-        return 0.0
-
-    def __put_text_on_screen__(self, text):
-        self.__display__.blit(self.__textBox__, (0, 360))
-        self.__display__.blit(self.__font__.render(text, True, (255, 255, 255)), (150, 390))
-        self.__display__.blit(self.__fontSpace__.render("[SPACE]", True, (255, 255, 255)), (560, 440))
-        pg.display.flip()
-
-    # TODO: this is a sprite's property, so move this to Sprite class
-    def set_visibility(self, tilex, tiley, value):
-        self.__visibility_data__[tilex][tiley] = value
-        self.update_fov = True
-
-    def __draw_fov__(self):
-        for x in range(len(self.__fov_data__)):
-            for y in range(len(self.__fov_data__[0])):
-                if self.__fov_data__[x][y]:
-                    newx, newy = self.__camera__.transform_xy(x * TILE_SIZE, y * TILE_SIZE)
-                    pg.draw.rect(self.__display__, (200, 200, 200), pg.Rect(newx, newy,
-                                                                            TILE_SIZE, TILE_SIZE), 1)

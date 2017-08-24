@@ -3,6 +3,7 @@ import pygame as pg
 from game.settings import TILE_SIZE, SLITHER_SPEED
 from misc import sgn
 from sprites import sprite_groups
+from triggers import Trigger
 
 
 class Sprite(pg.sprite.Sprite):
@@ -129,7 +130,7 @@ class Sprite(pg.sprite.Sprite):
                     self.x -= SLITHER_SPEED
 
     def collide_with_triggers(self):
-        hits = [s for s in self.game.triggers if self.get_rect().inflate(20, 20).colliderect(s.hit_rect)]
+        hits = [s for s in Trigger.triggers if self.get_rect().inflate(20, 20).colliderect(s.hit_rect)]
         for hit in hits:
             hit.on_hit()
 

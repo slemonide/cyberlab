@@ -2,10 +2,12 @@ import pygame as pg
 
 
 class Trigger:
+    triggers = []
+
     def __init__(self, game, hit_rect):
         self.game = game
         self.hit_rect = hit_rect
-        game.triggers.append(self)
+        Trigger.triggers.append(self)
 
     def callback(self):
         pass
