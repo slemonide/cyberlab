@@ -1,6 +1,7 @@
 import math
 import sys
 from os import path, getcwd
+from sprites import sprite_groups
 
 from game.map import *
 from items.pickable import Pickable
@@ -19,29 +20,23 @@ class Game:
     def __init__(self, display):
 
         # Contains pictures displayed on the player's screen
-        self.picture_queue = []
+        self.picture_queue = [] # TODO: finish
 
         # Contains text displayed on the player's screen
         self.text_queue = []
 
         # Contains menus displayed on the player's screen
-        self.menu_queue = []
+        self.menu_queue = [] # TODO: finish
 
-        self.display = display
-        self.clock = pg.time.Clock()
+        self.__display__ = display
+        self.__clock__ = pg.time.Clock()
         pg.display.set_caption(WINDOW_TITLE)
 
-        self.joysticks = [pg.joystick.Joystick(x) for x in range(pg.joystick.get_count())]
-        self.joystick = None
-        if len(self.joysticks) > 0:
-            self.joystick = self.joysticks[0]
-            self.joystick.init()
-
-        # sprite groups
-        self.all_sprites = None
-        self.items_on_floor = None
-        self.solid = None
-        self.doors = None
+        joysticks = [pg.joystick.Joystick(x) for x in range(pg.joystick.get_count())]
+        self.__joystick__ = None
+        if len(joysticks) > 0:
+            self.__joystick__ = joysticks[0]
+            self.__joystick__.init()
 
         self.triggers = []
         self.spritesheet = None
@@ -63,11 +58,6 @@ class Game:
         self.update_fov = True
 
     def load(self):
-        self.all_sprites = pg.sprite.Group()
-        self.solid = pg.sprite.Group()
-        self.items_on_floor = pg.sprite.Group()
-        self.doors = pg.sprite.Group()
-
         assets_folder = path.join(getcwd(), 'assets')
         self.map = Map(path.join(assets_folder, 'maps/map1.json'))
 
@@ -100,9 +90,9 @@ class Game:
         self.camera = Camera(self.map.width_screen, self.map.height_screen)
 
     def update(self):
-        self.gui.pre(self.joystick)
+        self.gui.pre(self.__joystick__)
 
-        for sprite in self.all_sprites:
+        for sprite in sprite_groups.all_sprites:
             sprite.update(self.dt)
 
         if self.camera.update(self.player) or self.update_fov:
@@ -117,23 +107,23 @@ class Game:
         self.gui.after()
 
     def draw(self):
-        self.display.fill(BG_COLOR)
+        self.__display__.fill(BG_COLOR)
 
         # TODO layering
-        for sprite in self.all_sprites:
+        for sprite in sprite_groups.all_sprites:
             if sprite != self.player and not isinstance(sprite, Item):
-                self.display.blit(sprite.image, self.camera.transform(sprite))
+                self.__display__.blit(sprite.image, self.camera.transform(sprite))
 
-        for sprite in self.items_on_floor:
+        for sprite in sprite_groups.items_on_floor:
             tilex = math.floor(sprite.x)
             tiley = math.floor(sprite.y)
             if self.fov_data[tilex][tiley]:
-                self.display.blit(sprite.image, self.camera.transform(sprite))
+                self.__display__.blit(sprite.image, self.camera.transform(sprite))
 
         if DEBUG_FOV:
             self.draw_fov()
 
-        self.display.blit(self.player.image, self.camera.transform(self.player))
+        self.__display__.blit(self.player.image, self.camera.transform(self.player))
         if self.text_queue:
             self.bot_message(self.text_queue[-1])
 
@@ -143,7 +133,7 @@ class Game:
     def run(self):
         self.playing = True
         while self.playing:
-            self.dt = self.clock.tick(FPS) / 1000
+            self.dt = self.__clock__.tick(FPS) / 1000
             self.events()
             self.update()
             self.draw()
@@ -182,8 +172,8 @@ class Game:
         pg.display.quit()
         pg.display.init()
 
-        self.display = pg.display.set_mode((w, h), flags ^ pg.FULLSCREEN, bits)
-        self.display.blit(tmp, (0, 0))
+        self.__display__ = pg.display.set_mode((w, h), flags ^ pg.FULLSCREEN, bits)
+        self.__display__.blit(tmp, (0, 0))
         pg.display.set_caption(*caption)
 
         pg.key.set_mods(0)
@@ -205,14 +195,14 @@ class Game:
         return False
 
     def get_axis(self, number):
-        if self.joystick is not None:
-            return self.joystick.get_axis(number)
+        if self.__joystick__ is not None:
+            return self.__joystick__.get_axis(number)
         return 0.0
 
     def bot_message(self, text):
-        self.display.blit(self.textBox, (0, 360))
-        self.display.blit(self.font.render(text, True, (255, 255, 255)), (150, 390))
-        self.display.blit(self.fontSpace.render("[SPACE]", True, (255, 255, 255)), (560, 440))
+        self.__display__.blit(self.textBox, (0, 360))
+        self.__display__.blit(self.font.render(text, True, (255, 255, 255)), (150, 390))
+        self.__display__.blit(self.fontSpace.render("[SPACE]", True, (255, 255, 255)), (560, 440))
         pg.display.flip()
 
     def set_visibility(self, tilex, tiley, value):
@@ -224,5 +214,5 @@ class Game:
             for y in range(len(self.fov_data[0])):
                 if self.fov_data[x][y]:
                     newx, newy = self.camera.transform_xy(x * TILE_SIZE, y * TILE_SIZE)
-                    pg.draw.rect(self.display, (200, 200, 200), pg.Rect(newx, newy,
-                                                                        TILE_SIZE, TILE_SIZE), 1)
+                    pg.draw.rect(self.__display__, (200, 200, 200), pg.Rect(newx, newy,
+                                                                            TILE_SIZE, TILE_SIZE), 1)

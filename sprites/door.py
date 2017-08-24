@@ -5,6 +5,7 @@ import pygame as pg
 from game.settings import *
 from triggers import KeyButtonTrigger
 from .sprite import Sprite
+from sprites import sprite_groups
 
 DOOR_THICKNESS = 8
 
@@ -21,7 +22,7 @@ class Door(Sprite):
             "down": game.spritesheet.get_image_alpha_at_row_col(4, 0),
             "left": game.spritesheet.get_image_alpha_at_row_col(5, 0)
         }
-        super().__init__(game, x, y, self.door_img[dir], (game.doors, game.solid))
+        super().__init__(game, x, y, self.door_img[dir], (sprite_groups.doors, sprite_groups.solid))
 
         self.door_hit_rect = {
             "up": (0, 0, TILE_SIZE, DOOR_THICKNESS),
@@ -62,7 +63,7 @@ class Door(Sprite):
         else:
             assert False
 
-        self.add(self.game.solid)
+        self.add(sprite_groups.solid)
         self.game.set_visibility(self.x, self.y, False)
 
     def open_door(self):
@@ -79,7 +80,7 @@ class Door(Sprite):
         else:
             assert False
 
-        self.remove(self.game.solid)
+        self.remove(sprite_groups.solid)
         self.game.set_visibility(self.x, self.y, True)
 
     def set_dir(self, dir):

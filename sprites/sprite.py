@@ -2,6 +2,7 @@ import pygame as pg
 
 from game.settings import TILE_SIZE, SLITHER_SPEED
 from misc import sgn
+from sprites import sprite_groups
 
 
 class Sprite(pg.sprite.Sprite):
@@ -21,7 +22,7 @@ class Sprite(pg.sprite.Sprite):
         """
         self.game = game
 
-        self.groups = groups, game.all_sprites
+        self.groups = groups, sprite_groups.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
 
         self.image = img
@@ -73,7 +74,7 @@ class Sprite(pg.sprite.Sprite):
         :return: obstacles in the way of sprite's movement
         """
 
-        return [s for s in self.game.solid if
+        return [s for s in sprite_groups.solid if
                 self.get_hit_rect()
                     .move(3 * sgn(dx), 3 * sgn(dy))
                     .colliderect(s.get_hit_rect())]
@@ -97,7 +98,7 @@ class Sprite(pg.sprite.Sprite):
         else:
             assert False
 
-        hits = [s for s in self.game.solid if s.get_hit_rect().collidepoint(point)]
+        hits = [s for s in sprite_groups.solid if s.get_hit_rect().collidepoint(point)]
 
         return not hits
 

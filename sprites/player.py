@@ -4,6 +4,7 @@ from game.settings import *
 from items.container import Container
 from ui.animation import Animation, PlayMode
 from .active_sprite import ActiveSprite
+from sprites import sprite_groups
 
 HITBOX_DOWN_SHIFT = -8
 
@@ -141,7 +142,7 @@ class Player(ActiveSprite):
             self.animation_timer = 0.0
 
     def pickup_items(self, auto_pick=False):
-        items = [s for s in self.game.items_on_floor if self.get_hit_rect().colliderect(s.get_hit_rect())]
+        items = [s for s in sprite_groups.items_on_floor if self.get_hit_rect().colliderect(s.get_hit_rect())]
         for item in items:
             if item.pickable is not None:
                 if auto_pick is True and item.pickable.auto_pick is False:
@@ -150,7 +151,7 @@ class Player(ActiveSprite):
                 self.game.text_queue.append("Picking up "+item.pickable.id+" ...")
                 # TODO move to pickable.py?
                 self.container.add(item.pickable)
-                item.remove(self.game.all_sprites, self.game.items_on_floor)
+                item.remove(sprite_groups.all_sprites, sprite_groups.items_on_floor)
 
     def drop_item(self):
         # drops first existing item
@@ -159,6 +160,6 @@ class Player(ActiveSprite):
             self.container.remove(pickable)
             item = pickable.owner
             item.set_position(self.x, self.y)
-            item.add(self.game.all_sprites, self.game.items_on_floor)
+            item.add(sprite_groups.all_sprites, sprite_groups.items_on_floor)
             print("dropped:", item.pickable.id, "x", item.pickable.amount)
             self.game.text_queue.append("Dropping "+item.pickable.id+" ...")
