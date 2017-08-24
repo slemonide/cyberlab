@@ -17,6 +17,16 @@ from ui.spritesheet import Spritesheet
 
 class Game:
     def __init__(self, display):
+
+        # Contains pictures displayed on the player's screen
+        self.picture_queue = []
+
+        # Contains text displayed on the player's screen
+        self.text_queue = []
+
+        # Contains menus displayed on the player's screen
+        self.menu_queue = []
+
         self.display = display
         self.clock = pg.time.Clock()
         pg.display.set_caption(WINDOW_TITLE)
@@ -46,8 +56,6 @@ class Game:
         self.textBox = pg.image.load("assets/textBox.png").convert_alpha()
         self.font = pg.font.Font("assets/fonts/Arcon.otf", 20)
         self.fontSpace = pg.font.Font("assets/fonts/Arcon.otf", 14)
-        self.showTextBox = False
-        self.text = None
 
         self.gui = Nanogui()
         self.visibility_data = None  # [x][y] -> True, False
@@ -126,8 +134,8 @@ class Game:
             self.draw_fov()
 
         self.display.blit(self.player.image, self.camera.transform(self.player))
-        if self.showTextBox is True:
-            self.bot_message(self.text)
+        if self.text_queue:
+            self.bot_message(self.text_queue[-1])
 
         self.gui.draw()
         pg.display.flip()

@@ -106,7 +106,7 @@ class Player(ActiveSprite):
         elif game.get_key_jp(pg.K_g) or game.get_key_jp(pg.K_e) or game.get_joystick_jp(J_BUTTONS['A']):
             self.pickup_items()
         if game.get_key_jp(pg.K_SPACE) or game.get_joystick_jp(J_BUTTONS['A']) or game.get_joystick_jp(J_BUTTONS['B']):
-            game.showTextBox = False
+            game.text_queue.pop()
 
         return self.is_moving()
 
@@ -147,8 +147,7 @@ class Player(ActiveSprite):
                 if auto_pick is True and item.pickable.auto_pick is False:
                     continue
                 print("picked up:", item.pickable.id, "x", item.pickable.amount)
-                self.game.text = "Picking up "+item.pickable.id+" ..."
-                self.game.showTextBox = True
+                self.game.text_queue.append("Picking up "+item.pickable.id+" ...")
                 # TODO move to pickable.py?
                 self.container.add(item.pickable)
                 item.remove(self.game.all_sprites, self.game.items_on_floor)
@@ -162,5 +161,4 @@ class Player(ActiveSprite):
             item.set_position(self.x, self.y)
             item.add(self.game.all_sprites, self.game.items_on_floor)
             print("dropped:", item.pickable.id, "x", item.pickable.amount)
-            self.game.text = "Dropping "+item.pickable.id+" ..."
-            self.game.showTextBox = True
+            self.game.text_queue.append("Dropping "+item.pickable.id+" ...")
