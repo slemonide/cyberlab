@@ -1,8 +1,10 @@
-import time
-import pygame as pg
 import sys
-from game import Game
-from settings import *
+import time
+
+import pygame as pg
+
+from game.game import Game
+from game.settings import *
 from nanogui import Nanogui
 
 OPTION_COLOR = (231, 100, 240)

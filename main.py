@@ -1,6 +1,7 @@
 import pygame
-from settings import *
-from menu import main_menu
+
+from game.settings import *
+from ui.menu import main_menu
 
 
 def main():

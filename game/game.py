@@ -1,17 +1,18 @@
+import math
 import sys
 from os import path, getcwd
-import math
-from spritesheet import Spritesheet
+
+from game.map import *
+from items.pickable import Pickable
+from nanogui import Nanogui
+from sprites.door import Door
+from sprites.item import Item
 from sprites.player import Player
 from sprites.wall import Wall
-from sprites.item import Item
-from sprites.door import Door
-from pickable import Pickable
-from nanogui import Nanogui
 from triggers import *
-from camera import *
-from map import *
-from fov import calc_fov
+from ui.camera import *
+from ui.fov import calc_fov
+from ui.spritesheet import Spritesheet
 
 
 class Game:

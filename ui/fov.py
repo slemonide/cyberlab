@@ -1,5 +1,3 @@
-from settings import *
-
 # multipliers to transform coordinates into other octants
 MULT = [
   [1,  0,  0, -1, -1,  0,  0,  1],

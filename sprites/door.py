@@ -1,8 +1,10 @@
 from operator import add
-from settings import *
-from .sprite import Sprite
+
 import pygame as pg
+
+from game.settings import *
 from triggers import KeyButtonTrigger
+from .sprite import Sprite
 
 DOOR_THICKNESS = 8
 

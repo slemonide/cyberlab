@@ -1,8 +1,8 @@
 import pygame as pg
-import math
-from settings import *
-from animation import Animation, PlayMode
-from container import Container
+
+from game.settings import *
+from items.container import Container
+from ui.animation import Animation, PlayMode
 from .active_sprite import ActiveSprite
 
 HITBOX_DOWN_SHIFT = -8

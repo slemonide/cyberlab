@@ -1,5 +1,6 @@
 import pygame as pg
-from settings import TILE_SIZE, SLITHER_SPEED
+
+from game.settings import TILE_SIZE, SLITHER_SPEED
 from misc import sgn
 
 
