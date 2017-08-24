@@ -22,9 +22,9 @@ class Nanogui:
             v()
 
     def pre(self, joystick):
-        # called in update
+        # called in __update__
         pass
 
     def after(self):
-        # called in update
+        # called in __update__
         pass

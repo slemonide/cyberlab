@@ -147,7 +147,6 @@ class Player(ActiveSprite):
             if item.pickable is not None:
                 if auto_pick is True and item.pickable.auto_pick is False:
                     continue
-                print("picked up:", item.pickable.id, "x", item.pickable.amount)
                 self.game.text_queue.append("Picking up "+item.pickable.id+" ...")
                 # TODO move to pickable.py?
                 self.container.add(item.pickable)
@@ -161,5 +160,4 @@ class Player(ActiveSprite):
             item = pickable.owner
             item.set_position(self.x, self.y)
             item.add(sprite_groups.all_sprites, sprite_groups.items_on_floor)
-            print("dropped:", item.pickable.id, "x", item.pickable.amount)
             self.game.text_queue.append("Dropping "+item.pickable.id+" ...")

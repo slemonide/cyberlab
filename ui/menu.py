@@ -40,7 +40,7 @@ class Menu:
         self.last_axis_motion = 0.0
 
     def run(self):
-        self.draw()  # draw first time to ignore self.updated
+        self.draw()  # __draw__ first time to ignore self.updated
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
@@ -120,7 +120,7 @@ def new_game(self):
     self.playing = False
 
     game = Game(self.display)
-    game.load()
+    game.load("map1")
     game.run()
 
 
