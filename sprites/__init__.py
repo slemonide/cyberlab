@@ -1,0 +1,1 @@
+__all__ = ["door", "item", "player", "wall"]
